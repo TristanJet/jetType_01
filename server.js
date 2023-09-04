@@ -68,6 +68,7 @@ wss.on("connection", (ws, request, client) => {
                 //finish game
             */
         } catch (e) {
+            //error is triggered here
             ws.send(String(e));
             ws.close();
         }
