@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { parse } from "node:url";
 import { decode as qsdecode } from "node:querystring";
 import { WebSocketServer } from "ws";
-import { v4 as uuidv4 } from "uuid";
+import { nanoid } from 'nanoid/non-secure'
 
 import { inputHandler } from "./input/input_handler.js";
 import { closeHandler } from "./input/logic.js";
@@ -39,7 +39,7 @@ server.on("upgrade", (request, socket, head) => {
         socket.removeListener("error", onSocketError);
 
         wss.handleUpgrade(request, socket, head, (ws) => {
-            const connectionId = uuidv4();
+            const connectionId = nanoid(10)
             ws.connectionId = connectionId;
             wss.emit("connection", ws, request, client);
         });
