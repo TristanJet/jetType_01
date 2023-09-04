@@ -1,4 +1,5 @@
 import { createClient } from "redis";
+import { endTimer } from "./timer.js";
 
 const redisclient = createClient({
     socket: {
@@ -8,13 +9,13 @@ const redisclient = createClient({
 });
 
 redisclient.on("error", (err) => {
-    console.log("Redis Client Error", err);
+    console.log("Redis Connection Error:\n", err);
     process.exit(1);
 });
 
 await redisclient.connect();
 
-async function logic(ws, input, quoteArray) {
+async function logic(ws, input, quoteArray, game) {
     const type = input.data.type;
     if (type === "add") {
         let value = input.data.value;
@@ -25,7 +26,10 @@ async function logic(ws, input, quoteArray) {
                 (val, index) => val === quoteArray[index]
             );
             if (isCorrect) {
+                game.gameFin = 1;
+                game.endTime = endTimer(game.startTime);
                 ws.send("--------\nWin!!!\n---------");
+                ws.send(`You typed the quote in: ${game.endTime}`)
             }
         }
         ws.send(`The length of current input is: ${String(len)}`);

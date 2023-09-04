@@ -49,14 +49,24 @@ server.on("upgrade", (request, socket, head) => {
 
 wss.on("connection", (ws, request, client) => {
     //Scope is unique to each connection
+    const game = {
+        gameStart: false,
+        gameFin: 0,
+        startTime: 0,
+        endTime: 0,
+    };
 
     ws.on("error", console.error);
-    console.log(`Websocket server online: object = ${Object.keys(ws)}`);
+    console.log(`Websocket server online: id = ${ws.connectionId}`);
 
-    ws.on("message", (data) => {
+    ws.on("message", async (data) => {
         console.log(`Received message ${data} from user ${client}`);
         try {
-            inputHandler(ws, JSON.parse(data), quoteArray);
+            await inputHandler(ws, JSON.parse(data), quoteArray, game);
+            /*
+            if (game.gameFin) 
+                //finish game
+            */
         } catch (e) {
             ws.send(String(e));
             ws.close();
@@ -64,7 +74,7 @@ wss.on("connection", (ws, request, client) => {
     });
 
     ws.on("close", () => {
-        console.log(client);
+        console.log(`${ws.connectionId} : is being disconnected`);
         closeHandler(ws, client);
     });
 });
