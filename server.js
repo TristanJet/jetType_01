@@ -3,7 +3,9 @@ import { parse } from "node:url";
 import { decode as qsdecode } from "node:querystring";
 import { WebSocketServer } from "ws";
 import { v4 as uuidv4 } from "uuid";
-import { inputHandler, closeHandler } from "./onInput.js";
+
+import { inputHandler } from "./input/input_handler.js";
+import { closeHandler } from "./input/logic.js";
 
 function onSocketError(err) {
     console.error(err);
@@ -50,7 +52,13 @@ wss.on("connection", (ws, request, client) => {
 
     ws.on("message", (data) => {
         console.log(`Received message ${data} from user ${client}`);
-        inputHandler(ws, quote, data);
+        try {
+            inputHandler(ws, JSON.parse(data), quote);
+        } catch (e) {
+            ws.send(String(e))
+            ws.close()
+        }
+        
     });
 
     ws.on("close", () => {

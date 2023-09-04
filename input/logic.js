@@ -11,10 +11,7 @@ redisclient.on("error", (err) => console.log("Redis Client Error", err));
 
 await redisclient.connect();
 
-//rpush + rpop
-
-async function inputHandler(ws, quote, input) {
-    input = JSON.parse(input);
+async function logic(ws, input, quote) {
     const quoteArray = quote.split("");
     const type = input.data.type;
     if (type === "add") {
@@ -40,4 +37,4 @@ async function closeHandler(ws) {
     console.log(`${ws.connectionId} was deleted from redis.`);
 }
 
-export { inputHandler, closeHandler };
+export { logic, closeHandler };
