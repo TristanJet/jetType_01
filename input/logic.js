@@ -7,12 +7,14 @@ const redisclient = createClient({
     },
 });
 
-redisclient.on("error", (err) => console.log("Redis Client Error", err));
+redisclient.on("error", (err) => {
+    console.log("Redis Client Error", err);
+    process.exit(1);
+});
 
 await redisclient.connect();
 
-async function logic(ws, input, quote) {
-    const quoteArray = quote.split("");
+async function logic(ws, input, quoteArray) {
     const type = input.data.type;
     if (type === "add") {
         let value = input.data.value;

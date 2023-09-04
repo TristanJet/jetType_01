@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { parse } from "node:url";
 import { decode as qsdecode } from "node:querystring";
 import { WebSocketServer } from "ws";
-import { nanoid } from 'nanoid/non-secure'
+import { nanoid } from "nanoid/non-secure";
 
 import { inputHandler } from "./input/input_handler.js";
 import { closeHandler } from "./input/logic.js";
@@ -23,6 +23,7 @@ function authenticate(request, callback) {
 }
 
 const quote = "Test.";
+const quoteArray = quote.split("");
 const server = createServer();
 const wss = new WebSocketServer({ noServer: true });
 
@@ -39,7 +40,7 @@ server.on("upgrade", (request, socket, head) => {
         socket.removeListener("error", onSocketError);
 
         wss.handleUpgrade(request, socket, head, (ws) => {
-            const connectionId = nanoid(10)
+            const connectionId = nanoid(10);
             ws.connectionId = connectionId;
             wss.emit("connection", ws, request, client);
         });
@@ -47,18 +48,19 @@ server.on("upgrade", (request, socket, head) => {
 });
 
 wss.on("connection", (ws, request, client) => {
+    //Scope is unique to each connection
+
     ws.on("error", console.error);
-    console.log(`Websocket server online: connectionId = ${ws.connectionId}`);
+    console.log(`Websocket server online: object = ${Object.keys(ws)}`);
 
     ws.on("message", (data) => {
         console.log(`Received message ${data} from user ${client}`);
         try {
-            inputHandler(ws, JSON.parse(data), quote);
+            inputHandler(ws, JSON.parse(data), quoteArray);
         } catch (e) {
-            ws.send(String(e))
-            ws.close()
+            ws.send(String(e));
+            ws.close();
         }
-        
     });
 
     ws.on("close", () => {
