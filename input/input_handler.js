@@ -5,7 +5,7 @@ import { startTimer } from "./timer.js";
 async function inputHandler(id, input, quoteArray, game) {
     let data;
     try {
-        data = JSON.parse(input)
+        data = JSON.parse(input);
         const valid = validate(data);
         if (!valid) {
             throw new Error(`${ajv.errorsText(validate.errors)}`);
@@ -13,10 +13,12 @@ async function inputHandler(id, input, quoteArray, game) {
     } catch (e) {
         throw new Error(`Client error, invalid JSON: ${e}`);
     }
+
     if (!game.gameStart) {
         game.gameStart = true;
         game.startTime = startTimer();
     }
+
     try {
         await logic(id, data, quoteArray, game);
     } catch (e) {

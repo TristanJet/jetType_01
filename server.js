@@ -65,10 +65,9 @@ wss.on("connection", (ws, request, client) => {
             await inputHandler(ws.connectionId, data, quoteArray, game);
             if (game.gameFin) {
                 ws.send("--------\nWin!!!\n---------");
-                ws.send(`You typed the quote in: ${game.endTime}`)
+                ws.send(`You typed the quote in: ${game.endTime}`);
             }
         } catch (e) {
-            //error is triggered here
             ws.send(String(e));
             ws.close();
         }

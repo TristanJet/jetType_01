@@ -31,7 +31,7 @@ async function logic(id, input, quoteArray, game) {
             }
         }
     } else if (type === "del") {
-        await redisclient.rPop(id)
+        await redisclient.rPop(id);
     }
 }
 
