@@ -2,7 +2,7 @@ import { logic } from "./logic.js";
 import { validate } from "./validate.js";
 import { startTimer } from "./timer.js";
 
-async function inputHandler(ws, input, quoteArray, game) {
+async function inputHandler(id, input, quoteArray, game) {
     let data;
     try {
         data = JSON.parse(input)
@@ -13,13 +13,12 @@ async function inputHandler(ws, input, quoteArray, game) {
     } catch (e) {
         throw new Error(`Client error, invalid JSON: ${e}`);
     }
-
     if (!game.gameStart) {
         game.gameStart = true;
         game.startTime = startTimer();
     }
     try {
-        await logic(ws, data, quoteArray, game);
+        await logic(id, data, quoteArray, game);
     } catch (e) {
         console.log(String(e));
         throw new Error("Server error: Logic error");

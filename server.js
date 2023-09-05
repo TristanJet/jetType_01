@@ -62,11 +62,11 @@ wss.on("connection", (ws, request, client) => {
     ws.on("message", async (data) => {
         console.log(`Received message ${data} from user ${client}`);
         try {
-            await inputHandler(ws, data, quoteArray, game);
-            /*
-            if (game.gameFin) 
-                //finish game
-            */
+            await inputHandler(ws.connectionId, data, quoteArray, game);
+            if (game.gameFin) {
+                ws.send("--------\nWin!!!\n---------");
+                ws.send(`You typed the quote in: ${game.endTime}`)
+            }
         } catch (e) {
             //error is triggered here
             ws.send(String(e));
@@ -76,7 +76,7 @@ wss.on("connection", (ws, request, client) => {
 
     ws.on("close", () => {
         console.log(`${ws.connectionId} : is being disconnected`);
-        closeHandler(ws, client);
+        closeHandler(ws.connectionId, client);
     });
 });
 
