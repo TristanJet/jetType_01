@@ -62,7 +62,7 @@ wss.on("connection", (ws, request, client) => {
     ws.on("message", async (data) => {
         console.log(`Received message ${data} from user ${client}`);
         try {
-            await inputHandler(ws, JSON.parse(data), quoteArray, game);
+            await inputHandler(ws, data, quoteArray, game);
             /*
             if (game.gameFin) 
                 //finish game
