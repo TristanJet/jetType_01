@@ -5,7 +5,7 @@ import { WebSocketServer } from "ws";
 import { nanoid } from "nanoid/non-secure";
 
 import { inputHandler } from "./input/input_handler.js";
-import { closeHandler } from "./input/logic.js";
+import { delClient } from "./input/logic.js";
 import { startTimer, endTimer } from "./input/timer.js";
 
 function onSocketError(err) {
@@ -53,7 +53,6 @@ wss.on("connection", (ws, request, client) => {
     let start = 0;
     let fin = 0;
     let timeStart = 0;
-    let timeEnd = 0;
 
     ws.on("error", console.error);
     console.log(`Websocket server online: id = ${ws.connectionId}`);
@@ -79,15 +78,18 @@ wss.on("connection", (ws, request, client) => {
         }
 
         if (fin) {
-            timeEnd = endTimer(timeStart);
+            const timeEnd = endTimer(timeStart);
             ws.send("--------\nWin!!!\n--------");
             ws.send(`You typed the quote in: ${timeEnd}`);
+            delClient(ws.connectionId);
+            start = 0
+
         }
     });
 
     ws.on("close", () => {
         console.log(`${ws.connectionId} : is being disconnected`);
-        closeHandler(ws.connectionId, client);
+        delClient(ws.connectionId);
     });
 });
 

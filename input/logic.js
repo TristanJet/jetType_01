@@ -35,9 +35,9 @@ async function logic(id, input, quoteArray) {
     }
 }
 
-async function closeHandler(id) {
+async function delClient(id) {
     await redisclient.del(id);
     console.log(`${id} was deleted from redis.`);
 }
 
-export { logic, closeHandler };
+export { logic, delClient };
