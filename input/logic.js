@@ -17,8 +17,8 @@ await redisclient.connect();
 async function logic(id, input, quoteArray) {
     const type = input.data.type;
     if (type === "add") {
-        let value = input.data.value;
-        let len = await redisclient.rPush(id, value);
+        const value = input.data.value;
+        const len = await redisclient.rPush(id, value);
         if (Number(len) === quoteArray.length) {
             const inputValue = await redisclient.lRange(id, 0, -1);
             const isCorrect = inputValue.every(
