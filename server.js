@@ -6,6 +6,7 @@ import { nanoid } from "nanoid/non-secure";
 
 import { inputHandler } from "./input/input_handler.js";
 import { closeHandler } from "./input/logic.js";
+import { startTimer, endTimer } from "./input/timer.js";
 
 function onSocketError(err) {
     console.error(err);
@@ -49,35 +50,38 @@ server.on("upgrade", (request, socket, head) => {
 
 wss.on("connection", (ws, request, client) => {
     //Scope is unique to each connection
-    const game = {
-        gameStart: false,
-        gameFin: 0,
-        startTime: 0,
-        endTime: 0,
-    };
+    let start = 0;
+    let fin = 0;
+    let timeStart = 0;
+    let timeEnd = 0;
 
     ws.on("error", console.error);
     console.log(`Websocket server online: id = ${ws.connectionId}`);
 
     ws.on("message", async (data) => {
         console.log(`Received message ${data} from user ${client}`);
-        const result = await inputHandler(
-            ws.connectionId,
-            data,
-            quoteArray,
-            game
-        );
 
-        if (result.statusCode === 400) {
+        const result = await inputHandler(ws.connectionId, data, quoteArray);
+
+        if (result.statusCode === 200) {
+            fin = result.gameFin;
+        } else if (result.statusCode === 400) {
             ws.send(`Input error: ${result.err}`);
             ws.close();
         } else if (result.statusCode === 500) {
             console.log(`Server error: ${result.err}`);
             ws.close();
         }
-        if (game.gameFin) {
-            ws.send("--------\nWin!!!\n---------");
-            ws.send(`You typed the quote in: ${game.endTime}`);
+
+        if (!start) {
+            timeStart = startTimer();
+            start = true;
+        }
+
+        if (fin) {
+            timeEnd = endTimer(timeStart);
+            ws.send("--------\nWin!!!\n--------");
+            ws.send(`You typed the quote in: ${timeEnd}`);
         }
     });
 

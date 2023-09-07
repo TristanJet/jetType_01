@@ -1,8 +1,7 @@
 import { logic } from "./logic.js";
 import { validateHandler } from "./validate.js";
-import { startTimer, endTimer } from "./timer.js";
 
-async function inputHandler(id, input, quoteArray, game) {
+async function inputHandler(id, input, quoteArray) {
     let data;
 
     try {
@@ -14,18 +13,11 @@ async function inputHandler(id, input, quoteArray, game) {
         };
     }
 
-    if (!game.gameStart) {
-        game.gameStart = true;
-        game.startTime = startTimer();
-    }
-
     try {
-        game.gameFin = await logic(id, data, quoteArray);
-        if (game.gameFin) {
-            game.endTime = endTimer(game.startTime);
-        }
+        const gameFin = await logic(id, data, quoteArray);
         return {
             statusCode: 200,
+            gameFin: gameFin,
         };
     } catch (e) {
         return {
