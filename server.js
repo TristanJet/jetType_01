@@ -61,15 +61,23 @@ wss.on("connection", (ws, request, client) => {
 
     ws.on("message", async (data) => {
         console.log(`Received message ${data} from user ${client}`);
-        try {
-            await inputHandler(ws.connectionId, data, quoteArray, game);
-            if (game.gameFin) {
-                ws.send("--------\nWin!!!\n---------");
-                ws.send(`You typed the quote in: ${game.endTime}`);
-            }
-        } catch (e) {
-            ws.send(String(e));
+        const result = await inputHandler(
+            ws.connectionId,
+            data,
+            quoteArray,
+            game
+        );
+
+        if (result.statusCode === 400) {
+            ws.send(`Input error: ${result.err}`);
             ws.close();
+        } else if (result.statusCode === 500) {
+            console.log(`Server error: ${result.err}`);
+            ws.close();
+        }
+        if (game.gameFin) {
+            ws.send("--------\nWin!!!\n---------");
+            ws.send(`You typed the quote in: ${game.endTime}`);
         }
     });
 

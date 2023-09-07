@@ -5,4 +5,14 @@ const ajv = new Ajv();
 
 const validate = ajv.compile(schema);
 
-export { validate };
+function validateHandler(rawInput) {
+    const data = JSON.parse(rawInput);
+    const valid = validate(data);
+    if (!valid) {
+        throw new Error(`${ajv.errorsText(validate.errors)}`);
+    } else {
+        return data;
+    }
+}
+
+export { validateHandler };

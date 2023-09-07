@@ -1,5 +1,4 @@
 import { createClient } from "redis";
-import { endTimer } from "./timer.js";
 
 const redisclient = createClient({
     socket: {
@@ -15,23 +14,24 @@ redisclient.on("error", (err) => {
 
 await redisclient.connect();
 
-async function logic(id, input, quoteArray, game) {
+async function logic(id, input, quoteArray) {
     const type = input.data.type;
     if (type === "add") {
         let value = input.data.value;
         let len = await redisclient.rPush(id, value);
         if (Number(len) === quoteArray.length) {
-            let inputValue = await redisclient.lRange(id, 0, -1);
-            let isCorrect = inputValue.every(
+            const inputValue = await redisclient.lRange(id, 0, -1);
+            const isCorrect = inputValue.every(
                 (val, index) => val === quoteArray[index]
             );
             if (isCorrect) {
-                game.gameFin = 1;
-                game.endTime = endTimer(game.startTime);
+                return 1;
             }
         }
+        return 0;
     } else if (type === "del") {
         await redisclient.rPop(id);
+        return 0;
     }
 }
 

@@ -1,17 +1,17 @@
 import { logic } from "./logic.js";
-import { validate } from "./validate.js";
-import { startTimer } from "./timer.js";
+import { validateHandler } from "./validate.js";
+import { startTimer, endTimer } from "./timer.js";
 
 async function inputHandler(id, input, quoteArray, game) {
     let data;
+
     try {
-        data = JSON.parse(input);
-        const valid = validate(data);
-        if (!valid) {
-            throw new Error(`${ajv.errorsText(validate.errors)}`);
-        }
+        data = validateHandler(input);
     } catch (e) {
-        throw new Error(`Client error, invalid JSON: ${e}`);
+        return {
+            statusCode: 400,
+            err: e,
+        };
     }
 
     if (!game.gameStart) {
@@ -20,10 +20,18 @@ async function inputHandler(id, input, quoteArray, game) {
     }
 
     try {
-        await logic(id, data, quoteArray, game);
+        game.gameFin = await logic(id, data, quoteArray);
+        if (game.gameFin) {
+            game.endTime = endTimer(game.startTime);
+        }
+        return {
+            statusCode: 200,
+        };
     } catch (e) {
-        console.log(String(e));
-        throw new Error("Server error: Logic error");
+        return {
+            statusCode: 500,
+            err: e,
+        };
     }
 }
 
