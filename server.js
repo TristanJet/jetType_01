@@ -65,10 +65,12 @@ wss.on("connection", (ws, request, client) => {
         if (result.statusCode === 200) {
             fin = result.gameFin;
         } else if (result.statusCode === 400) {
-            ws.send(`Input error: ${result.err}`);
+            console.log(`Input error: ${result.err}`);
+            ws.send('Input error')
             ws.close();
         } else if (result.statusCode === 500) {
             console.log(`Server error: ${result.err}`);
+            ws.send('Server error')
             ws.close();
         }
 
@@ -81,9 +83,9 @@ wss.on("connection", (ws, request, client) => {
             const timeEnd = endTimer(timeStart);
             ws.send("--------\nWin!!!\n--------");
             ws.send(`You typed the quote in: ${timeEnd}`);
+
             delClient(ws.connectionId);
             start = 0
-
         }
     });
 

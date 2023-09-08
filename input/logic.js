@@ -28,11 +28,10 @@ async function logic(id, input, quoteArray) {
                 return 1;
             }
         }
-        return 0;
     } else if (type === "del") {
         await redisclient.rPop(id);
-        return 0;
     }
+    return 0;
 }
 
 async function delClient(id) {
