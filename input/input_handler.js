@@ -11,7 +11,7 @@ async function inputHandler(game, input, quoteArray) {
     if (type === "add") {
         const value = input.data.value;
         const len = game.inputState.push(value);
-        if (Number(len) === quoteArray.length) {
+        if (len === quoteArray.length) {
             const isCorrect = game.inputState.every(
                 (val, index) => val === quoteArray[index]
             );
@@ -22,10 +22,9 @@ async function inputHandler(game, input, quoteArray) {
             }
         }
     } else if (type === "del") {
+
         game.inputState.pop();
     }
-    
-    return;
 }
 
 export { inputHandler };

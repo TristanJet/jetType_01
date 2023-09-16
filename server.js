@@ -90,6 +90,11 @@ wss.on("connection", (ws, request, client) => {
             game.fin = false;
             game.inputState = Array();
         }
+
+        if (game.break) {
+            ws.send('Too much')
+            ws.close()
+        }
         
     });
 
