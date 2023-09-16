@@ -1,30 +1,31 @@
-import { logic } from "./logic.js";
-import { validateHandler } from "./validate.js";
+import { startTimer, endTimer } from "./timer.js";
 
-async function inputHandler(id, input, quoteArray) {
-    let data;
+async function inputHandler(game, input, quoteArray) {
 
-    try {
-        data = validateHandler(input);
-    } catch (e) {
-        return {
-            statusCode: 400,
-            err: e,
-        };
+    if (!game.start) {
+        game.timeStart = startTimer();
+        game.start = true;
     }
 
-    try {
-        const gameFin = await logic(id, data, quoteArray);
-        return {
-            statusCode: 200,
-            gameFin: gameFin,
-        };
-    } catch (e) {
-        return {
-            statusCode: 500,
-            err: e,
-        };
+    const type = input.data.type;
+    if (type === "add") {
+        const value = input.data.value;
+        const len = game.inputState.push(value);
+        if (Number(len) === quoteArray.length) {
+            const isCorrect = game.inputState.every(
+                (val, index) => val === quoteArray[index]
+            );
+            if (isCorrect) {
+                game.fin = true
+                game.timeFinal = endTimer(game.timeStart)
+                console.log(game.timeFinal)
+            }
+        }
+    } else if (type === "del") {
+        game.inputState.pop();
     }
+    
+    return;
 }
 
 export { inputHandler };

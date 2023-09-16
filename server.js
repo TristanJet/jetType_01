@@ -5,8 +5,7 @@ import { WebSocketServer } from "ws";
 import { nanoid } from "nanoid/non-secure";
 
 import { inputHandler } from "./input/input_handler.js";
-import { delClient } from "./input/logic.js";
-import { startTimer, endTimer } from "./input/timer.js";
+import { validateHandler } from "./input/validate.js";
 
 function onSocketError(err) {
     console.error(err);
@@ -50,48 +49,52 @@ server.on("upgrade", (request, socket, head) => {
 
 wss.on("connection", (ws, request, client) => {
     //Scope is unique to each connection
-    let start = 0;
-    let fin = 0;
-    let timeStart = 0;
+    //Server is concerned with: sending data, logging errors, and updating scope, logic is in another function.
+
+    const game = {
+        start: false,
+        fin: false,
+        timeStart: 0,
+        timeFinal: 0,
+        inputState: Array(),
+    };
 
     ws.on("error", console.error);
     console.log(`Websocket server online: id = ${ws.connectionId}`);
 
-    ws.on("message", async (data) => {
-        console.log(`Received message ${data} from user ${client}`);
+    ws.on("message", async (input) => {
+        console.log(`Received message ${input} from user ${client}`);
 
-        const result = await inputHandler(ws.connectionId, data, quoteArray);
+        let inputParse;
 
-        if (result.statusCode === 200) {
-            fin = result.gameFin;
-        } else if (result.statusCode === 400) {
+        try {
+            inputParse = validateHandler(input);
+        } catch (e) {
             console.log(`Input error: ${result.err}`);
-            ws.send('Input error')
-            ws.close();
-        } else if (result.statusCode === 500) {
-            console.log(`Server error: ${result.err}`);
-            ws.send('Server error')
+            ws.send("Input error");
             ws.close();
         }
 
-        if (!start) {
-            timeStart = startTimer();
-            start = true;
-        }
-
-        if (fin) {
-            const timeEnd = endTimer(timeStart);
+        inputHandler(game, inputParse, quoteArray);
+        /*
+            if (timeout) {
+                 console.log('Timeout')
+                  ws.send('Timeout, disconnected for inactivity');
+                  ws.close()
+            }
+*/
+        if (game.fin) {
             ws.send("--------\nWin!!!\n--------");
-            ws.send(`You typed the quote in: ${timeEnd}`);
-
-            delClient(ws.connectionId);
-            start = 0
+            ws.send(`You typed the quote in: ${game.timeFinal}`);
+            game.start = false;
+            game.fin = false;
+            game.inputState = Array();
         }
+        
     });
 
     ws.on("close", () => {
         console.log(`${ws.connectionId} : is being disconnected`);
-        delClient(ws.connectionId);
     });
 });
 
