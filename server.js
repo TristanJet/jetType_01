@@ -23,7 +23,7 @@ function authenticate(request, callback) {
 }
 
 const server = createServer();
-const PORT = process.enc.PORT || 3000
+const PORT = process.env.PORT || 3000
 const wss = new WebSocketServer({ noServer: true });
 
 const quote = "Test.";
