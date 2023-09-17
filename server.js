@@ -23,6 +23,7 @@ function authenticate(request, callback) {
 }
 
 const server = createServer();
+const IP = '';
 const PORT = process.env.PORT || 3000
 const wss = new WebSocketServer({ noServer: true });
 
@@ -94,4 +95,4 @@ wss.on("connection", (ws, request, client) => {
     });
 });
 
-server.listen(PORT);
+server.listen(PORT, IP);
