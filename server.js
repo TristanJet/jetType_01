@@ -22,10 +22,12 @@ function authenticate(request, callback) {
     }
 }
 
+const server = createServer();
+const PORT = process.enc.PORT || 3000
+const wss = new WebSocketServer({ noServer: true });
+
 const quote = "Test.";
 const quoteArray = quote.split("");
-const server = createServer();
-const wss = new WebSocketServer({ noServer: true });
 
 server.on("upgrade", (request, socket, head) => {
     socket.on("error", onSocketError);
@@ -76,13 +78,7 @@ wss.on("connection", (ws, request, client) => {
         }
 
         inputHandler(game, inputParse, quoteArray);
-        /*
-            if (timeout) {
-                 console.log('Timeout')
-                  ws.send('Timeout, disconnected for inactivity');
-                  ws.close()
-            }
-*/
+        
         if (game.fin) {
             ws.send("--------\nWin!!!\n--------");
             ws.send(`You typed the quote in: ${game.timeFinal}`);
@@ -98,4 +94,4 @@ wss.on("connection", (ws, request, client) => {
     });
 });
 
-server.listen(8080);
+server.listen(PORT);
