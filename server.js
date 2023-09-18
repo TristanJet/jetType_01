@@ -12,6 +12,7 @@ function onSocketError(err) {
 }
 
 function authenticate(request, callback) {
+    console.log('Authenticating...')
     const queryString = parse(request.url, true).search.substring(1);
     const decode = qsdecode(queryString);
 
@@ -23,8 +24,8 @@ function authenticate(request, callback) {
 }
 
 const server = createServer();
-const IP = '';
-const PORT = process.env.PORT || 3000
+const IP = '0.0.0.0';
+const PORT = 3000
 const wss = new WebSocketServer({ noServer: true });
 
 const quote = "Test.";
