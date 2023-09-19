@@ -24,7 +24,7 @@ function authenticate(request, callback) {
 }
 
 const server = createServer();
-const IP = '0.0.0.0';
+const IP = 'localhost';
 const PORT = 3000
 const wss = new WebSocketServer({ noServer: true });
 
